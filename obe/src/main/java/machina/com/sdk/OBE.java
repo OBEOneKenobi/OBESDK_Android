@@ -1,4 +1,4 @@
-package machina.com.obe;
+package machina.com.sdk;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.util.FloatMath;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -172,12 +171,6 @@ public class OBE {
         					|| uuid.startsWith(QuaternionCharacteristic_Center))*/
                             {
                                 //Log.d("MAIN", "Activating Notifications" );
-                                // ENABLE INDICATION
-        				/*BluetoothGattCharacteristic characteristic =gattCharacteristic;
-                    	mBluetoothGatt.setCharacteristicNotification(characteristic, true);
-                    	BluetoothGattDescriptor localBluetoothGattDescriptor = characteristic.getDescriptor(UUID.fromString(toUuid128(10498L)));
-                    	localBluetoothGattDescriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-                    	mBluetoothGatt.writeDescriptor(localBluetoothGattDescriptor);*/
 
                                 // ENABLE NOTIFICATION
                                 BluetoothGattCharacteristic characteristic = gattCharacteristic;
@@ -257,8 +250,9 @@ public class OBE {
 
                         int aux = arrayOfByte[MPUDataSize - 2];
                         bufferToFloat(arrayOfByte, aux);
-                        if(aux == QuaternionRight){
+                        if(aux == QuaternionCenter){
                             int auxButtons = arrayOfByte[19] & 0xFF;
+
 
                         }
 
@@ -276,11 +270,6 @@ public class OBE {
         		}*/
                     }
 
-            /*String str = "a";
-            byte[] strBytes = str.getBytes();
-            write_characteristic.setValue(strBytes);
-            write_characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            gatt.writeCharacteristic(write_characteristic);*/
                 }
 
 

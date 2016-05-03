@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="machina.com.obe">
+    package="machina.com.sdk">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <application
