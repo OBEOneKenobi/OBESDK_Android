@@ -8,4 +8,5 @@ public interface OBEListener {
     public void onOBEConnected();
     public void onQuaternionsUpdated(OBEQuaternion left, OBEQuaternion right, OBEQuaternion center);
     public void onButtonsUpdated();
+    public void onBatteryChanged();
 }

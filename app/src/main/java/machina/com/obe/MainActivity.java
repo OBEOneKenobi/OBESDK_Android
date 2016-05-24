@@ -5,10 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ToggleButton;
 
 import machina.com.sdk.OBE;
+import machina.com.sdk.OBEListener;
+import machina.com.sdk.OBEQuaternion;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OBEListener {
 
     private OBE obe;
 
@@ -27,6 +32,25 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });*/
+
+        // create OBE class with context and listener
+        obe = new OBE(getApplicationContext(), this);
+
+        final Button searchButton = (Button)findViewById(R.id.button_search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                obe.startBluetooth();
+            }
+        });
+
+        final ToggleButton toggleButton = (ToggleButton)findViewById(R.id.toggleMotor);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     @Override
@@ -49,5 +73,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onOBEConnected() {
+
+    }
+
+    @Override
+    public void onQuaternionsUpdated(OBEQuaternion left, OBEQuaternion right, OBEQuaternion center) {
+
+    }
+
+    @Override
+    public void onButtonsUpdated() {
+
+    }
+
+    @Override
+    public void onBatteryChanged() {
+
     }
 }

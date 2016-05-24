@@ -24,12 +24,14 @@ public class OBE {
     //TODO: Right and Center missing the right characteristic
     private static String QuaternionCharacteristic = "0003cbb2-0000-1000-8000-00805f9b0131";
     private static String HapticCharacteristic = "0003cbb1-0000-1000-8000-00805f9b0131";
+    private static String BatteryCharacteristic = "00002a19-0000-1000-8000-00805f9b34fb";
 
     private static int QuaternionLeft = 0;
     private static int QuaternionRight = 1;
     private static int QuaternionCenter = 2;
     private static int MPUDataSize = 20;
     private static int HapticDataSize = 7;
+    private static int BatteryDataSize = 1;
 
     private Context context;
     BluetoothAdapter mBtAdapter;
@@ -49,12 +51,15 @@ public class OBE {
     public double mxCenter, myCenter, mzCenter;
     //public int Buttons;
     public double Motor1, Motor2, Motor3, Motor4;
+    public double batteryLevel;
+    public int LeftButtons, RightButtons, LogoButtons;
 
     public OBEQuaternion quaternionLeft, quaternionRight, quaternionCenter;
     public OBEEulerAngles eulerAnglesLeft, eulerAnglesRight, eulerAnglesCenter;
     public OBEButtons buttons;
 
     BluetoothGattCharacteristic write_characteristic;
+    private boolean isStarted = false;
 
     //0 - not started
     //1 - connecting
@@ -76,6 +81,13 @@ public class OBE {
 		*/
     int state = 0;
 
+    public OBE(){ }
+
+    public OBE(Context context, OBEListener listen) {
+        this.context = context;
+        listener = listen;
+    }
+
     public void setContext(Context context) {
         this.context = context;
     }
@@ -86,6 +98,10 @@ public class OBE {
 
     public void startBluetooth(){
         state = 1;
+
+        if (isStarted){
+
+        }
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if(quaternionLeft == null){
@@ -186,6 +202,22 @@ public class OBE {
                                     //Log.i("Notification status", "Not enabled");
                                 }
                             }
+                            else if(uuid.startsWith(BatteryCharacteristic)){
+                                //Log.i("Battery Char", "Found");
+                                // ENABLE NOTIFICATION
+                                BluetoothGattCharacteristic characteristic = gattCharacteristic;
+                                mBluetoothGatt.setCharacteristicNotification(characteristic, true);
+                                BluetoothGattDescriptor localBluetoothGattDescriptor =
+                                        characteristic.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+
+                                if(localBluetoothGattDescriptor != null) {
+                                    localBluetoothGattDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                                    mBluetoothGatt.writeDescriptor(localBluetoothGattDescriptor);
+                                    //Log.i("Notification status", "Enabled");
+                                } else {
+                                    //Log.i("Notification status", "Not enabled");
+                                }
+                            }
                             //OBE-Haptics Characteristic
                             else if(uuid.startsWith(HapticCharacteristic)){
                                 write_characteristic = gattCharacteristic;
@@ -240,21 +272,9 @@ public class OBE {
                 @Override
                 public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     // if callback is null, do nothing
-        	/*if(callback == null){
-    			return;
-    		}*/
-
-                    byte[] arrayOfByte = characteristic.getValue();
-                    if(arrayOfByte.length == MPUDataSize){
-                        //completePacket = arrayOfByte;
-
-                        int aux = arrayOfByte[MPUDataSize - 2];
-                        bufferToFloat(arrayOfByte, aux);
-                        if(aux == QuaternionCenter){
-                            int auxButtons = arrayOfByte[19] & 0xFF;
-
-
-                        }
+        	        /*if(callback == null){
+    			        return;
+    		        }*/
 
                         // Convert bytes to floats
         		/*float w = ByteBuffer.wrap(arrayOfByte, 0, 4).order(ByteOrder.LITTLE_ENDIAN).getFloat();
@@ -268,6 +288,34 @@ public class OBE {
         		if(uuid.equals(QuaternionCharacteristic_Left)){
         			callback.onQuaternionUpdated(w, x, y, z, Quaternion_Left);
         		}*/
+
+                    byte[] arrayOfByte = characteristic.getValue();
+
+                    if(characteristic.getUuid().toString().startsWith(QuaternionCharacteristic)){
+                        if(arrayOfByte.length == MPUDataSize){
+                            //completePacket = arrayOfByte;
+
+                            int aux = arrayOfByte[MPUDataSize - 2];
+                            bufferToFloat(arrayOfByte, aux);
+                            if(aux == QuaternionCenter){
+                                LogoButtons = arrayOfByte[19] & 0xFF;
+                                //Buttons = LogoButtons; // keep compatibility with OBE oldest firmware
+                            }else if(aux == QuaternionLeft){
+                                LeftButtons = arrayOfByte[19] & 0xFF;
+                            }else if(aux == QuaternionRight){
+                                RightButtons = arrayOfByte[19] & 0xFF;
+                            }
+                        }
+                    }else if(characteristic.getUuid().toString().startsWith(BatteryCharacteristic)){
+                        if(arrayOfByte.length == BatteryDataSize){
+                            int aux = (int)(arrayOfByte[0] & 0xFF);
+
+                            float auxFloat = ((float)aux) / 100.0f;
+                            // Update Battery
+                            batteryLevel = auxFloat;
+
+                            listener.onBatteryChanged();
+                        }
                     }
 
                 }
