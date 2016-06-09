@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import machina.com.sdk.OBE;
@@ -48,7 +49,14 @@ public class MainActivity extends AppCompatActivity implements OBEListener {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(toggleButton.isChecked()){
+                    obe.motor1 = 1.0; obe.motor2 = 1.0;
+                    obe.motor3 = 1.0; obe.motor4 = 1.0;
+                }else{
+                    obe.motor1 = 0.0; obe.motor2 = 0.0;
+                    obe.motor3 = 0.0; obe.motor4 = 0.0;
+                }
+                obe.updateMotors();
             }
         });
     }
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OBEListener {
 
     @Override
     public void onOBEConnected() {
-
+        Toast.makeText(getApplicationContext(), "OBE Connected", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -92,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements OBEListener {
 
     @Override
     public void onBatteryChanged() {
-
+        String battery = String.valueOf(obe.batteryLevel);
+        Toast.makeText(getApplicationContext(), "Battery: " + battery, Toast.LENGTH_SHORT).show();
     }
 }

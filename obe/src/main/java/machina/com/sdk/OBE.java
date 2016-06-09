@@ -50,7 +50,7 @@ public class OBE {
     public double gxCenter, gyCenter, gzCenter;
     public double mxCenter, myCenter, mzCenter;
     //public int Buttons;
-    public double Motor1, Motor2, Motor3, Motor4;
+    public double motor1, motor2, motor3, motor4;
     public double batteryLevel;
     public int LeftButtons, RightButtons, LogoButtons;
 
@@ -376,10 +376,10 @@ public class OBE {
             byte[] data = new byte[HapticDataSize];
 
             data[0] = (byte)0x7E;
-            data[1] = doubleToByte(Motor1);
-            data[2] = doubleToByte(Motor2);
-            data[3] = doubleToByte(Motor3);
-            data[4] = doubleToByte(Motor4);
+            data[1] = doubleToByte(motor1);
+            data[2] = doubleToByte(motor2);
+            data[3] = doubleToByte(motor3);
+            data[4] = doubleToByte(motor4);
             data[5] = (byte)0xFF;
             data[6] = 0x00;
 
